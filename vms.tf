@@ -42,7 +42,7 @@ resource "azurerm_windows_virtual_machine" "dc01" {
   computer_name       = "ADGUARD-DC01" # this is the name Windows itself will show, e.g. in Server Manager
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
-  size                = "Standard_B2s" # 2 vCPU / 4 GB RAM — cheapest size that still runs a Windows GUI smoothly
+  size                = "Standard_B1ms" # 2 vCPU / 4 GB RAM — cheapest size that still runs a Windows GUI smoothly
   admin_username      = var.admin_username
   admin_password      = var.admin_password
   network_interface_ids = [
@@ -128,7 +128,7 @@ resource "azurerm_windows_virtual_machine" "target" {
   computer_name       = "ADGUARD-TARGET"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
-  size                = "Standard_B2s"
+  size                = "Standard_B1ms"
   admin_username      = var.admin_username
   admin_password      = var.admin_password
   network_interface_ids = [
