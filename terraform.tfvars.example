@@ -1,0 +1,27 @@
+# terraform.tfvars.example
+# ----------------------------------------------------------------------------
+# HOW TO USE THIS FILE:
+#   1. Make a COPY of this file named exactly "terraform.tfvars" (no
+#      ".example" at the end).
+#   2. Fill in the two values below that say REPLACE_ME.
+#   3. Never delete the ".gitignore" file in this project — it's what
+#      stops your real terraform.tfvars (with your real password in it)
+#      from ever being uploaded to GitHub by accident.
+# ----------------------------------------------------------------------------
+
+resource_group_name    = "rg-adguard"
+location                = "centralindia"  # closest region if you're in India; change if Azure rejects it for your student subscription — southeastasia is a good fallback
+project_prefix          = "adguard"
+
+allowed_ip               = "REPLACE_ME/32"  # your public IP from whatismyip.com, keep the /32 at the end
+
+admin_username            = "adguardadmin"
+admin_password             = "REPLACE_ME_STRONG_PASSWORD"  # 12+ characters, mix of upper/lower/number/symbol
+
+# Auto-shutdown is a SAFETY NET, not your main on/off switch (that's the
+# Azure Portal Start/Stop buttons). If you're doing this whole project in
+# one long day, set this a few hours past when you realistically expect
+# to finish, so it doesn't cut you off mid-task. 0200 = 2:00 AM.
+auto_shutdown_time         = "0200"
+auto_shutdown_timezone     = "India Standard Time"
+
