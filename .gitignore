@@ -1,0 +1,25 @@
+# .gitignore
+# ----------------------------------------------------------------------------
+# WHAT THIS FILE DOES: tells Git "never track or upload these files, even
+# if I accidentally try to add them." This is what protects your real
+# password and personal IP address from ending up on public GitHub.
+# ----------------------------------------------------------------------------
+
+# Terraform's internal tracking files — these can contain secrets in
+# plain, readable text, so they must never be committed.
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+crash.log
+crash.*.log
+
+# Your REAL variables file (has your real password + IP in it).
+# The ".example" version is intentionally still tracked and uploaded —
+# that one has no real secrets in it, it's just a template for others.
+terraform.tfvars
+!terraform.tfvars.example
+
+# Common OS junk files, not related to this project
+.DS_Store
+Thumbs.db
