@@ -51,9 +51,9 @@
 
 ## Worked Example — Scenario 1 (Anomalous Remote Logon)
 
-**Incident ID:** `ADGUARD-2026-09-27-01`
+**Incident ID:** `ADGUARD-2026-09-30-01`
 **Scenario:** 1 — Anomalous Remote Logon
-**Analyst:** [your name]
+**Analyst:** [Hiral]
 **Severity:** Medium
 **Status:** Closed
 
@@ -65,30 +65,30 @@
 ### 2. Detection & Analysis
 | Field | Value |
 |---|---|
-| Detection time (UTC) | [fill in] |
+| Detection time (UTC) | [fill in from your Splunk Triggered Alerts timestamp] |
 | Triggering host | ADGUARD-TARGET |
-| Source IP / account involved | [external test IP] / jsmith |
-| Relevant Event ID(s) | 4624, Logon_Type 10 |
-| Initial severity assessment | Medium — real account, real successful auth, source outside the trusted VNet range, but a known test condition |
+| Source IP / account involved | Mobile hotspot IP (`106.202.96.208`) / jsmith |
+| Relevant Event ID(s) | 4624, Logon_Type 7 |
+| Initial severity assessment | Medium — real account, real successful auth, source outside the trusted VNet range, but a known test condition (test login performed deliberately from a phone hotspot to generate an untrusted-source event) |
 
-**Analyst narrative:** Alert fired within the scheduled detection window following a deliberate external test login. No IP reputation check performed — noted as a gap in `mitre-attack-mapping.md`. In a real environment lacking the "this was a test" context, this would default to High pending triage.
+**Analyst narrative:** Alert fired within the scheduled detection window following a deliberate login from outside the home/office trusted IP (using a mobile hotspot to guarantee a different public IP). Source correctly excluded from the trusted-range filter, confirming the detection boundary works as designed. No IP reputation check performed — noted as a gap in `mitre-attack-mapping.md`. In a real environment lacking the "this was a test" context, this would default to High pending triage.
 
 ### 3. Containment, Eradication & Recovery
 | Field | Value |
 |---|---|
-| Action taken | Active Directory `disable-user` executed against `jsmith` via Shuffle, over LDAP to the DC |
-| Who/what approved it | Human approval via the emailed user-input link |
-| Time to containment | [fill in — should be under 5 minutes given the only manual step is the approval click] |
-| Verification method | A second, independent Shuffle call re-queried the account's `userAccountControl` attribute and confirmed `ACCOUNTDISABLE` before reporting success — not just trusting that the "disable" action ran without error |
+| Action taken | **Manual** — Active Directory account `jsmith` disabled by hand in ADUC on `ADGUARD-DC01`, after Shuffle's automated approval chain completed |
+| Who/what approved it | Human approval via Shuffle's User Input node (approved using the `frontend_continue` link, since the email delivery for this step did not arrive during testing — see `lab-notebook.md`, item 15) |
+| Time to containment | 4 minutes, 18 seconds |
+| Verification method | Manually refreshed Active Directory Users and Computers and confirmed the disabled-account (down-arrow) icon appeared on the `jsmith` object |
 
-**Analyst narrative:** [fill in from your actual run]
+**Analyst narrative:** The playbook was designed for Shuffle to disable the account automatically via its Active Directory app immediately after approval. That app failed on every call (both a read-only "get user attributes" test and the actual "disable user" action) with `ValueError: unsupported hash type MD4` — traced to Shuffle's AD app using NTLM authentication internally, which requires an MD4 hash that the runtime's crypto library refuses to compute since MD4 is a broken legacy algorithm. This was confirmed as a hard platform bug, not a misconfiguration, by testing two different login formats and confirming no alternate authentication-type setting exists in the app's fixed field set. The workflow was redesigned so that, after approval, Shuffle posts a "MANUAL ACTION REQUIRED" message to Slack instead of calling Active Directory directly, and the analyst completes the disable action by hand. Every other stage of the chain (detection, Slack alert, email/approval gate) worked exactly as designed.
 
 ### 4. Post-Incident Activity
-- **Root cause:** Deliberate test — NSG rule for RDP was temporarily widened to Any, a login performed from outside the network, then the rule reverted immediately.
-- **What worked well:** Full chain (detect → notify → human decision → automated action → independent verification → confirmation) completed with a single manual step.
-- **Gaps identified:** No enrichment step before human escalation; detection boundary doesn't account for legitimate remote work.
-- **Follow-up actions:** Add IP reputation lookup before escalating; replace the Domain Admin LDAP bind with a least-privilege service account.
-- **MTTR:** [fill in]
+- **Root cause:** Deliberate test — NSG rule for RDP was temporarily widened to Any, a login performed from a mobile hotspot (to guarantee a source IP outside the trusted range), then the rule reverted immediately afterward.
+- **What worked well:** Full chain up through approval (detect → notify → human decision) completed correctly and quickly. The pivot to a manual-disable step, once the platform bug was identified, was itself fast to implement (delete the broken node, add an Http+webhook node in its place).
+- **Gaps identified:** No enrichment step before human escalation. Detection boundary doesn't account for legitimate remote work. Shuffle's Active Directory app is not usable for account-disable automation on this backend. Email delivery for the approval step did not arrive during testing (worked around via the direct approval link instead — root cause not fully diagnosed).
+- **Follow-up actions:** Add IP reputation lookup before escalating. Replace the Domain Admin LDAP bind with a least-privilege service account if a working AD automation path is found. Investigate the email delivery gap separately. Re-test Shuffle's Active Directory app periodically in case the MD4 issue gets fixed upstream, or migrate this specific action to Microsoft Sentinel + Logic Apps / a custom WinRM runbook instead.
+- **MTTR:** [fill in — from initial Slack alert to manual account disable confirmed in ADUC]
 
 ---
 
@@ -96,7 +96,7 @@
 
 **Incident ID:** `ADGUARD-2026-09-27-02`
 **Scenario:** 2 — Brute-Force Login Attempt
-**Analyst:** [your name]
+**Analyst:** [hiral]
 **Severity:** Medium
 **Status:** Closed (monitoring only — no automated response wired up for this scenario, by design)
 
@@ -107,13 +107,13 @@
 ### 2. Detection & Analysis
 | Field | Value |
 |---|---|
-| Detection time (UTC) | [fill in] |
+| Detection time (UTC) | 10:26:45:689 p.m |
 | Triggering host | |
 | Source IP / account involved | |
 | Relevant Event ID(s) | 4625 ×5+ within 1 minute |
 | Initial severity assessment | |
 
-**Analyst narrative:** [fill in — how many attempts, over what time span, did any attempt succeed?]
+**Analyst narrative:** All 6 attempts originated from the external source IP 106.202.96.208. No attempts succeeded during this window, and the threat was successfully intercepted prior to account compromise.
 
 ### 3. Containment, Eradication & Recovery
 **Analyst narrative:** By design, this scenario has **no automated remediation** — see the design-decisions section of the README for why (real brute-force response is usually a lockout policy + ticket, not an immediate account disable via bot). Document here what a human analyst *would* do manually: check if the account subsequently succeeded, check for account lockout policy engagement, consider a manual password reset.
@@ -128,7 +128,7 @@
 
 **Incident ID:** `ADGUARD-2026-09-27-03`
 **Scenario:** 3 — Privilege Escalation
-**Analyst:** [your name]
+**Analyst:** [hiral]
 **Severity:** High
 **Status:** Closed
 
@@ -139,13 +139,12 @@
 ### 2. Detection & Analysis
 | Field | Value |
 |---|---|
-| Detection time (UTC) | |
+| Detection time (UTC) |07:41:36 AM |
 | Account added to Domain Admins | jsmith |
-| Who performed the change (Caller_User_Name) | |
+| Who performed the change (Administrator) | |
 | Relevant Event ID(s) | 4728 |
 | Initial severity assessment | High — Domain Admins is the highest-privilege group in the domain; any addition warrants review regardless of context |
 
-**Analyst narrative:** [fill in — was the change plausible as an authorized action, or clearly anomalous?]
 
 ### 3. Containment, Eradication & Recovery
 **Analyst narrative:** By design, no automated remediation for this scenario either — a real environment would require cross-referencing this against a change-management/ticketing system before taking any action, since a legitimate admin change looks identical to a compromise from Splunk's point of view alone.
