@@ -87,17 +87,17 @@ resource "azurerm_network_security_group" "lab" {
   # for how long — which is good practice to point to later.
   # ----------------------------------------------------------------------
 
-  security_rule {
-    name                       = "TEMP-Allow-RDP-Any"
-    priority                   = 200
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "3389"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
-  }
+  # security_rule {
+  #   name                       = "TEMP-Allow-RDP-Any"
+  #   priority                   = 200
+  #   direction                  = "Inbound"
+  #   access                     = "Allow"
+  #   protocol                   = "Tcp"
+  #   source_port_range          = "*"
+  #   destination_port_range     = "3389"
+  #   source_address_prefix      = "*"
+  #   destination_address_prefix = "*"
+  # }
 
   # security_rule {
   #   name                       = "TEMP-Allow-LDAP-Shuffle"
