@@ -1,5 +1,7 @@
 # ADGuard Detections (Splunk SPL)
 
+**Status: all three detections confirmed firing in Splunk (Activity > Triggered Alerts). Scenario 1: alert -> Shuffle -> Slack, 56 s from logon event to alert. Scenario 2 (brute force): fired 2026-09-29 22:51 GMT, Medium. Scenario 3 (Domain Admins add): Event 4728 at 23:12:39, alert fired 23:13:00 GMT (about 21 s), High.** Scenario 1's response chain is semi-automated — see `docs/mitre-attack-mapping.md` and `docs/incident-response-report-template.md` for why.
+
 Each detection below is saved in Splunk as a scheduled alert. The queries live here too so the repo shows exactly what was built.
 
 **Before using:** replace `YOUR_HOME_IP` with your real public IP (the same one in `allowed_ip`). This is the stand-in for "the office IP" - logins from it are treated as trusted.

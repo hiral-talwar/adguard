@@ -65,7 +65,7 @@
 ### 2. Detection & Analysis
 | Field | Value |
 |---|---|
-| Detection time (UTC) | [fill in from your Splunk Triggered Alerts timestamp] |
+| Detection time (UTC) | [2026-09-30 00:01:00 UTC] |
 | Triggering host | ADGUARD-TARGET |
 | Source IP / account involved | Mobile hotspot IP (`106.202.96.208`) / jsmith |
 | Relevant Event ID(s) | 4624, Logon_Type 7 |
@@ -88,13 +88,13 @@
 - **What worked well:** Full chain up through approval (detect → notify → human decision) completed correctly and quickly. The pivot to a manual-disable step, once the platform bug was identified, was itself fast to implement (delete the broken node, add an Http+webhook node in its place).
 - **Gaps identified:** No enrichment step before human escalation. Detection boundary doesn't account for legitimate remote work. Shuffle's Active Directory app is not usable for account-disable automation on this backend. Email delivery for the approval step did not arrive during testing (worked around via the direct approval link instead — root cause not fully diagnosed).
 - **Follow-up actions:** Add IP reputation lookup before escalating. Replace the Domain Admin LDAP bind with a least-privilege service account if a working AD automation path is found. Investigate the email delivery gap separately. Re-test Shuffle's Active Directory app periodically in case the MD4 issue gets fixed upstream, or migrate this specific action to Microsoft Sentinel + Logic Apps / a custom WinRM runbook instead.
-- **MTTR:** [fill in — from initial Slack alert to manual account disable confirmed in ADUC]
-
+- **MTTR:** Not measured. Time to detect: 56 s (logon event at 2026-09-30 00:00:04 UTC, alert fired 00:01:00 UTC). The manual account disable in ADUC was done after the Slack "MANUAL ACTION REQUIRED" message, but its timestamp was not captured before the lab was torn down.
+**Lesson:** record containment timestamps during the test. Windows logs Event ID 4725 when an account is disabled, so Splunk would have captured it automatically.
 ---
 
 ## Worked Example — Scenario 2 (Brute-Force Login Attempt)
 
-**Incident ID:** `ADGUARD-2026-09-27-02`
+**Incident ID:** `ADGUARD-2026-09-29-02`
 **Scenario:** 2 — Brute-Force Login Attempt
 **Analyst:** [hiral]
 **Severity:** Medium
@@ -107,7 +107,7 @@
 ### 2. Detection & Analysis
 | Field | Value |
 |---|---|
-| Detection time (UTC) | 10:26:45:689 p.m |
+| Detection time (UTC) | 2026-09-29 22:51 GMT |
 | Triggering host | |
 | Source IP / account involved | |
 | Relevant Event ID(s) | 4625 ×5+ within 1 minute |
@@ -126,7 +126,7 @@
 
 ## Worked Example — Scenario 3 (Privilege Escalation)
 
-**Incident ID:** `ADGUARD-2026-09-27-03`
+**Incident ID:** `ADGUARD-2026-09-29-03`
 **Scenario:** 3 — Privilege Escalation
 **Analyst:** [hiral]
 **Severity:** High
@@ -139,7 +139,7 @@
 ### 2. Detection & Analysis
 | Field | Value |
 |---|---|
-| Detection time (UTC) |07:41:36 AM |
+| Detection time (UTC) |23:13:00 GMT |
 | Account added to Domain Admins | jsmith |
 | Who performed the change (Administrator) | |
 | Relevant Event ID(s) | 4728 |

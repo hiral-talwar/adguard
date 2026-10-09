@@ -6,7 +6,8 @@ Built in one continuous sprint on Azure for Students. This is the real record of
 
 | Date | Start | Stop | Parts worked on | VMs stopped (deallocated)? |
 |---|---|---|---|---|
-| [fill in your actual date] | [fill start time] | [fill stop time] | Parts 0 → G, full build in one session | Yes — manually via Azure Portal, no auto-shutdown schedule (removed by choice) |
+| 29/09/2026 – 30/09/2026 | 16:43:54 GMT | 01:40:45 GMT | Parts 0 → F (build, detections, SOAR playbook, testing) | Stopped manually via Azure Portal; no auto-shutdown schedule (removed by choice) |
+| 03/10/2026 | ~15:15 IST | ~15:40 IST | Teardown (`terraform destroy`; resource group deleted manually after a power-off error) | N/A, resource group deleted |
 
 ## Errors and fixes — the full sequence, in the order they actually happened
 

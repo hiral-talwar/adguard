@@ -55,3 +55,18 @@ Almost nothing worked perfectly on the first try, and fixing each thing taught m
 - **`docs/mitre-attack-mapping.md`** — full technique mapping and known coverage gaps
 - **`docs/incident-response-report-template.md`** — each test written up as a formal incident report
 - **`detections/adguard-detections.md`** — the actual Splunk search queries used
+
+## Validation & numbers
+
+| Item | Detail |
+|---|---|
+| Detection rules | 3 Splunk scheduled alerts (SPL) |
+| MITRE ATT&CK | T1078, T1021.001, T1110, T1098 |
+| Data source | Windows Security Event IDs 4624, 4625, 4728 from 2 Universal Forwarders |
+| Attack simulation | Manual only: RDP login from a mobile hotspot, repeated wrong-password RDP logins, Domain Admins group add via ADUC. No Atomic Red Team or Kali used. |
+| Alert latency | 56 s (Scenario 1) and about 21 s (Scenario 3), from event to alert firing, on 1-minute test schedules |
+| Detection rate | Not statistically measured. Each scenario was run a small number of times by hand, so this is functional validation, not a true-positive rate. No false-positive testing was done. |
+| Scenarios 2 and 3 | Both fired in Splunk Triggered Alerts. Scenario 3: event at 23:12:39, alert at 23:13:00 GMT (about 21 s). |
+| Response | Alert and approval gate automated; account disable manual (Shuffle AD app MD4 bug) |
+
+**Next step to make this measurable:** rebuild with Terraform, run Atomic Red Team tests for T1110.001, T1078 and T1098 (about 10 runs each), and report detections fired / runs plus a baseline false-positive count.
