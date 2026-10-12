@@ -1,4 +1,4 @@
-# ADGuard - Simulate. Detect. Defend.
+# ADGuard: Simulate. Detect. Defend.
 
 ## What this is
 
@@ -33,7 +33,7 @@ The exact search queries used to detect each one, written in Splunk's query lang
 
 Splunk detects it → sends an alert to Shuffle → Shuffle posts to Slack and emails a "should we disable this account?" question to a human analyst → once approved, the response continues. The intent was full automation end-to-end; what actually happened (and why) is below.
 
-## What I learned — including what broke
+## What I learned - including what broke
 
 Almost nothing worked perfectly on the first try, and fixing each thing taught me more than a clean run would have. The full blow-by-blow, including every exact error message and fix, is in `docs/lab-notebook.md`.
 
